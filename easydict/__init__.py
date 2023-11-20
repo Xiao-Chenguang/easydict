@@ -117,6 +117,16 @@ class EasyDict(dict):
     Traceback (most recent call last):
     ...
     AttributeError: 'EasyDict' object has no attribute 'a'
+
+    convert to pure dict
+    >>> d = EasyDict({'foo':0, 'bar':[{'x':1, 'y':2}, {'x':3, 'y':4}]})
+    >>> d.__class__.__name__
+    'EasyDict'
+    >>> p = d.todict()
+    >>> p
+    {'foo': 0, 'bar': [{'x': 1, 'y': 2}, {'x': 3, 'y': 4}]}
+    >>> p.__class__.__name__
+    'dict'
     """
     def __init__(self, d=None, **kwargs):
         if d is None:
@@ -129,13 +139,12 @@ class EasyDict(dict):
             setattr(self, k, v)
         # Class attributes
         for k in self.__class__.__dict__.keys():
-            if not (k.startswith('__') and k.endswith('__')) and not k in ('update', 'pop'):
+            if not (k.startswith('__') and k.endswith('__')) and not k in ('update', 'pop', 'todict'):
                 setattr(self, k, getattr(self, k))
 
     def __setattr__(self, name, value):
         if isinstance(value, (list, tuple)):
-            value = [self.__class__(x)
-                     if isinstance(x, dict) else x for x in value]
+            value = [self.__class__(x) if isinstance(x, dict) else x for x in value]
         elif isinstance(value, dict) and not isinstance(value, EasyDict):
             value = EasyDict(value)
         super(EasyDict, self).__setattr__(name, value)
@@ -152,6 +161,15 @@ class EasyDict(dict):
     def pop(self, k, d=None):
         delattr(self, k)
         return super(EasyDict, self).pop(k, d)
+    
+    def todict(self):
+        d = {}
+        for name, value in self.items():
+            if isinstance(value, (list, tuple)):
+                d[name] = [x.todict() if isinstance(x, EasyDict) else x for x in value]
+            else:
+                d[name] = value.todict() if isinstance(value, EasyDict) else value
+        return d
 
 
 if __name__ == "__main__":
