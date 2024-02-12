@@ -158,6 +158,15 @@ class EasyDict(dict):
         for k in d:
             setattr(self, k, d[k])
 
+    def merge(self, e=None, **f):
+        d = e or dict()
+        d.update(f)
+        for k in d:
+            if isinstance(self.get(k), EasyDict) and isinstance(d[k], dict):
+                self[k].merge(d[k])
+            else:
+                self[k] = d[k]
+
     def pop(self, k, d=None):
         delattr(self, k)
         return super(EasyDict, self).pop(k, d)
