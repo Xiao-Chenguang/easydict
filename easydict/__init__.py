@@ -33,7 +33,7 @@ class EasyDict(dict):
     {'a': 1}
     >>> EasyDict((('a', 1), ('b', 2)))
     {'a': 1, 'b': 2}
-    
+
     Set attributes
 
     >>> d = EasyDict()
@@ -128,18 +128,24 @@ class EasyDict(dict):
     >>> p.__class__.__name__
     'dict'
     """
+
     def __init__(self, d=None, **kwargs):
         if d is None:
             d = {}
         else:
-            d = dict(d)        
+            d = dict(d)
         if kwargs:
             d.update(**kwargs)
         for k, v in d.items():
             setattr(self, k, v)
         # Class attributes
         for k in self.__class__.__dict__.keys():
-            if not (k.startswith('__') and k.endswith('__')) and k not in ('update', 'pop', 'todict', 'merge'):
+            if not (k.startswith("__") and k.endswith("__")) and k not in (
+                "update",
+                "pop",
+                "todict",
+                "merge",
+            ):
                 setattr(self, k, getattr(self, k))
 
     def __setattr__(self, name, value):
@@ -170,7 +176,7 @@ class EasyDict(dict):
     def pop(self, k, d=None):
         delattr(self, k)
         return super(EasyDict, self).pop(k, d)
-    
+
     def todict(self):
         d = {}
         for name, value in self.items():
@@ -183,4 +189,5 @@ class EasyDict(dict):
 
 if __name__ == "__main__":
     import doctest
+
     doctest.testmod()
