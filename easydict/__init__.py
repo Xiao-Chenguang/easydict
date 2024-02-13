@@ -122,7 +122,7 @@ class EasyDict(dict):
     >>> d = EasyDict({'foo':0, 'bar':[{'x':1, 'y':2}, {'x':3, 'y':4}]})
     >>> d.__class__.__name__
     'EasyDict'
-    >>> p = d.todict()
+    >>> p = d.to_dict()
     >>> p
     {'foo': 0, 'bar': [{'x': 1, 'y': 2}, {'x': 3, 'y': 4}]}
     >>> p.__class__.__name__
@@ -143,7 +143,7 @@ class EasyDict(dict):
             if not (k.startswith("__") and k.endswith("__")) and k not in (
                 "update",
                 "pop",
-                "todict",
+                "to_dict",
                 "merge",
             ):
                 setattr(self, k, getattr(self, k))
@@ -177,13 +177,13 @@ class EasyDict(dict):
         delattr(self, k)
         return super(EasyDict, self).pop(k, d)
 
-    def todict(self):
+    def to_dict(self):
         d = {}
         for name, value in self.items():
             if isinstance(value, (list, tuple)):
-                d[name] = [x.todict() if isinstance(x, EasyDict) else x for x in value]
+                d[name] = [x.to_dict() if isinstance(x, EasyDict) else x for x in value]
             else:
-                d[name] = value.todict() if isinstance(value, EasyDict) else value
+                d[name] = value.to_dict() if isinstance(value, EasyDict) else value
         return d
 
 
